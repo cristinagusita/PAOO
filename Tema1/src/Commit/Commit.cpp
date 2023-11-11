@@ -1,50 +1,74 @@
 #include "Commit.h"
-#include<iostream>
-#include<cstring>
+#include <iostream>
+#include <cstring>
 
-Commit::Commit(int id, const char* message, int data) {
+int MyGit::Commit::idCounter = 0; 
+
+MyGit::Commit::Commit(const char* message) {
     std::cout<<"I am the commit constructor!"<<"\n";
-    this->id = id;
+    this->id = ++idCounter;
     this->message = new char[strlen(message)+1];
     strcpy(this->message, message);
-    this->data = data;
 }
 
-Commit::Commit(const Commit& other) {
+MyGit::Commit::Commit(const Commit& other) {
         std::cout<<"I am the COPY constructor!"<<"\n";
-        this->id = other.id;
+        this->id = ++idCounter;
         this->message = new char[strlen(other.message)+1];
         strcpy(this->message, other.message);
-        this->data = other.data;
     }
 
-Commit::Commit(Commit&& other) noexcept {
+MyGit::Commit::Commit(Commit&& other) noexcept {
         std::cout<<"I am the MOVE constructor!"<<"\n";
         this->id = other.id;
         this->message = other.message;
-        this->data = other.data;   
         other.id = 0;
         other.message = nullptr;
-        other.data = 0;
 }
 
-Commit::~Commit() {
+MyGit::Commit::~Commit() {
     std::cout<<"I am the commit destructor!"<<"\n";
     delete[] message;
 }
 
-int Commit::getId() const {
+MyGit::Commit& MyGit::Commit::operator=(const Commit& other) {
+    if (this != &other) {
+        delete[] message;
+        id = other.id;
+        message = new char[strlen(other.message) + 1];
+        strcpy(message, other.message);
+    }
+    return *this;
+}
+
+MyGit::Commit& MyGit::Commit::operator=(Commit&& other) noexcept {
+    if (this != &other) {
+        delete[] message;
+        id = other.id;
+        message = other.message;
+        other.id = 0;
+        other.message = nullptr;
+    }
+    return *this;
+}
+
+bool MyGit::Commit::operator==(const Commit& other) const {
+    return (id == other.id) && (strcmp(message, other.message) == 0);
+}
+
+bool MyGit::Commit::operator!=(const Commit& other) const {
+    return !(*this == other);
+}
+
+
+int MyGit::Commit::getId() const {
     return id;
 }
 
-char* Commit::getMessage() const {
+char* MyGit::Commit::getMessage() const {
     return message;
 }
 
-int Commit::getData() const {
-    return data;
-}
-
-void Commit::exampleModifyMessage() {
+void MyGit::Commit::exampleModifyMessage() {
     this->message[0] = 'c';
 }

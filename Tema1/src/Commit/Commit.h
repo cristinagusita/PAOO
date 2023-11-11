@@ -1,28 +1,26 @@
 #pragma once
+#include "IVersionControl.h"
 #include <string>
 
 namespace MyGit {
-    class Commit {
-        private:
-            int id;
+    class Commit : public IVersionControlObject {
+        protected:
+            static int idCounter;
+            int id;   
             char* message;
-            int data; 
 
         public:
-            Commit(int id, const char* message, int data);
+            Commit(const char* message);
             Commit(const Commit& other); 
             Commit(Commit&& other) noexcept; 
-            ~Commit();
-            MyGit::Commit& MyGit::Commit::operator=(const Commit&);
-            MyGit::Commit& MyGit::Commit::operator=(Commit&&);
-            bool MyGit::Commit::operator==(const Commit&) const;
-            bool MyGit::Commit::operator!=(const Commit&) const;
+            virtual ~Commit();
+            Commit& operator=(const Commit&);
+            Commit& operator=(Commit&&) noexcept;
+            bool operator==(const Commit&) const;
+            bool operator!=(const Commit&) const;
             int getId() const;
             char* getMessage() const;
-            int getData() const;
             void exampleModifyMessage();
 
         };
 }
-
-
