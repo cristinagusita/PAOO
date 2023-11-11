@@ -1,24 +1,33 @@
 #include "Commit.h"
+#include "FeatureCommit.h"
+#include "BugFixCommit.h"
+#include "MergeCommit.h"
 #include "Repository.h"
 #include <iostream>
 
+using MyGit::Repository;
+using MyGit::Commit;
+using MyGit::FeatureCommit;
+using MyGit::BugFixCommit;
+using MyGit::MergeCommit;
+
 int main() {
-    Repository repo;
+    Repository rep;
 
-    Commit c1(1, "Initial commit", 42);
-    Commit c2(2, "Added new feature", 84);
-    Commit c3(3, "Bug fixes and improvements :)", 16);
+    Commit* featureCommit = new FeatureCommit("Added a new feature", "The feature X now manages to blablabla");
 
-    repo.addCommit(c1);
-    repo.addCommit(c2);
-    repo.addCommit(c3);
+    Commit* bugCommit = new BugFixCommit("Solved a bug", "This bug fix blablabla");
 
-    c2.exampleModifyMessage();
+    Commit* mergeCommit = new MergeCommit("Merged feature X with master", "This merge commit blablabla");
 
-    Commit found = repo.getCommitById(2);
-    std::cout << "Commit Message after modification: " << c2.getMessage() << "\n";
-    std::cout << "Commit Message: " << found.getMessage() << "\n";
-    std::cout << "Commit Data: " << found.getData() << "\n";
+    rep.addCommit(featureCommit);
+    rep.addCommit(bugCommit);
+    rep.addCommit(mergeCommit);
+
+    for (auto commit : rep.getCommits()) {
+        commit->display();
+    }
+    
 
     return 0;
 }
