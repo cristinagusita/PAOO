@@ -6,14 +6,14 @@ namespace MyGit {
 
 class Repository {
     private:
-        std::vector<Commit> commits;
+        std::vector<Commit*> commits;
 
     public:
         Repository();
         ~Repository();
-        void addCommit(const Commit& commit);
-        Commit getCommitById(int id) const;
+        void addCommit(Commit* commit);
+        const Commit* getCommitById(int id) const;
+        std::vector<Commit*> getCommits() const;
     };
 
 }
-
