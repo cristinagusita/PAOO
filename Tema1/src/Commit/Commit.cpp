@@ -32,16 +32,18 @@ MyGit::Commit::~Commit() {
 }
 
 MyGit::Commit& MyGit::Commit::operator=(const Commit& other) {
+    std::cout<<"I am the copy assignment!"<<"\n";
     if (this != &other) {
         delete[] message;
-        id = other.id;
         message = new char[strlen(other.message) + 1];
         strcpy(message, other.message);
     }
     return *this;
 }
 
+
 MyGit::Commit& MyGit::Commit::operator=(Commit&& other) noexcept {
+    std::cout<<"I am the move assignment!"<<"\n";
     if (this != &other) {
         delete[] message;
         id = other.id;
@@ -53,7 +55,7 @@ MyGit::Commit& MyGit::Commit::operator=(Commit&& other) noexcept {
 }
 
 bool MyGit::Commit::operator==(const Commit& other) const {
-    return (id == other.id) && (strcmp(message, other.message) == 0);
+    return (strcmp(message, other.message) == 0);
 }
 
 bool MyGit::Commit::operator!=(const Commit& other) const {
