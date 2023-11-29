@@ -3,19 +3,21 @@
 #include <cstring>
 
 int MyGit::Commit::idCounter = 0; 
+std::mutex MyGit::Commit::mutex;
 
 MyGit::Commit::Commit(const char* message) {
-    std::cout<<"I am the commit constructor!"<<"\n";
+    std::lock_guard<std::mutex> lock(mutex);
+    std::cout << "I am the commit constructor!\n";
     this->id = ++idCounter;
-    this->message = new char[strlen(message)+1];
-    strcpy(this->message, message);
+    this->message = std::shared_ptr<char[]>(new char[strlen(message)+1]);
+    strcpy(this->message.get(), message);
 }
 
 MyGit::Commit::Commit(const Commit& other) {
         std::cout<<"I am the COPY constructor!"<<"\n";
         this->id = ++idCounter;
-        this->message = new char[strlen(other.message)+1];
-        strcpy(this->message, other.message);
+        this->message = std::shared_ptr<char[]>(new char[strlen(other.message.get())+1]);
+        strcpy(this->message.get(), other.message.get());
     }
 
 MyGit::Commit::Commit(Commit&& other) noexcept {
@@ -28,15 +30,14 @@ MyGit::Commit::Commit(Commit&& other) noexcept {
 
 MyGit::Commit::~Commit() {
     std::cout<<"I am the commit destructor!"<<"\n";
-    delete[] message;
 }
 
 MyGit::Commit& MyGit::Commit::operator=(const Commit& other) {
     std::cout<<"I am the copy assignment!"<<"\n";
     if (this != &other) {
-        delete[] message;
-        message = new char[strlen(other.message) + 1];
-        strcpy(message, other.message);
+        id = ++idCounter;
+        message = std::shared_ptr<char[]>(new char[strlen(other.message.get())+1]);
+        strcpy(message.get(), other.message.get());
     }
     return *this;
 }
@@ -45,7 +46,6 @@ MyGit::Commit& MyGit::Commit::operator=(const Commit& other) {
 MyGit::Commit& MyGit::Commit::operator=(Commit&& other) noexcept {
     std::cout<<"I am the move assignment!"<<"\n";
     if (this != &other) {
-        delete[] message;
         id = other.id;
         message = other.message;
         other.id = 0;
@@ -55,7 +55,7 @@ MyGit::Commit& MyGit::Commit::operator=(Commit&& other) noexcept {
 }
 
 bool MyGit::Commit::operator==(const Commit& other) const {
-    return (strcmp(message, other.message) == 0);
+    return (strcmp(message.get(), other.message.get()) == 0);
 }
 
 bool MyGit::Commit::operator!=(const Commit& other) const {
@@ -67,7 +67,7 @@ int MyGit::Commit::getId() const {
     return id;
 }
 
-char* MyGit::Commit::getMessage() const {
+std::weak_ptr<char[]> MyGit::Commit::getMessage() const {
     return message;
 }
 

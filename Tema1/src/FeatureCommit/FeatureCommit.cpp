@@ -3,13 +3,13 @@
 using namespace MyGit;
 
 FeatureCommit::FeatureCommit(const char* message, const char* featureDetails) : Commit(message) {
-    this->featureDetails = new char[strlen(featureDetails) + 1];
-    strcpy(this->featureDetails, featureDetails);
+    this->featureDetails = std::shared_ptr<char[]>(new char[strlen(featureDetails) + 1]);
+    strcpy(this->featureDetails.get(), featureDetails);
 }
 
 FeatureCommit::FeatureCommit(const FeatureCommit& other) : Commit(other) {
-    this->featureDetails = new char[strlen(other.featureDetails) + 1];
-    strcpy(this->featureDetails, other.featureDetails);
+    this->featureDetails = std::shared_ptr<char[]>(new char[strlen(other.featureDetails.get()) + 1]);
+    strcpy(this->featureDetails.get(), other.featureDetails.get());
 }
 
 FeatureCommit::FeatureCommit(FeatureCommit&& other) noexcept : Commit(std::move(other)) {
@@ -18,15 +18,13 @@ FeatureCommit::FeatureCommit(FeatureCommit&& other) noexcept : Commit(std::move(
 }
 
 FeatureCommit::~FeatureCommit() {
-    delete[] this->featureDetails;
 }
 
 FeatureCommit& FeatureCommit::operator=(const FeatureCommit& other) {
     if (this != &other) {
         Commit::operator=(other);
-        delete[] this->featureDetails;
-        this->featureDetails = new char[strlen(other.featureDetails) + 1];
-        strcpy(this->featureDetails, other.featureDetails);
+        this->featureDetails = std::shared_ptr<char[]>(new char[strlen(other.featureDetails.get()) + 1]);
+        strcpy(this->featureDetails.get(), other.featureDetails.get());
     }
     return *this;
 }
@@ -34,7 +32,6 @@ FeatureCommit& FeatureCommit::operator=(const FeatureCommit& other) {
 FeatureCommit& FeatureCommit::operator=(FeatureCommit&& other) noexcept {
     if (this != &other) {
         Commit::operator=(std::move(other));
-        delete[] this->featureDetails;
         this->featureDetails = other.featureDetails;
         other.featureDetails = nullptr;
     }
@@ -42,7 +39,7 @@ FeatureCommit& FeatureCommit::operator=(FeatureCommit&& other) noexcept {
 }
 
 bool FeatureCommit::operator==(const FeatureCommit& other) const {
-    return Commit::operator==(other) && (strcmp(this->featureDetails, other.featureDetails) == 0);
+    return Commit::operator==(other) && (strcmp(this->featureDetails.get(), other.featureDetails.get()) == 0);
 }
 
 bool FeatureCommit::operator!=(const FeatureCommit& other) const {
@@ -51,18 +48,25 @@ bool FeatureCommit::operator!=(const FeatureCommit& other) const {
 
 
 void FeatureCommit::setFeatureDetails(const char* details) {
-    this->featureDetails = new char[strlen(details) + 1];
-    strcpy(this->featureDetails, details); 
+    this->featureDetails = std::shared_ptr<char[]>(new char[strlen(details) + 1]);
+    strcpy(this->featureDetails.get(), details); 
 }
 
 const char* FeatureCommit::getFeatureDetails() const {
-    return this->featureDetails;
+    return this->featureDetails.get();
 }
 
 void FeatureCommit::display() const {
+    std::lock_guard<std::mutex> lock(mutex);
     std::cout<<"FeatureCommit: "<<"\n";
     std::cout<<"\tId: "<<this->getId()<<"\n";
-    std::cout<<"\tMessage: "<<this->getMessage()<<"\n";
+     std::cout<<"\tMessage: ";
+    auto sharedMessage = this->getMessage().lock(); // Convert to shared_ptr
+    if (sharedMessage) {
+        std::cout << sharedMessage.get() << "\n";
+    } else {
+        std::cout << "No message available\n";
+    }
     std::cout<<"\tFeature commit details: "<<this->featureDetails<<"\n";
 }
 
