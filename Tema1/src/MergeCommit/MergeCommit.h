@@ -6,7 +6,7 @@ namespace MyGit {
 
     class MergeCommit : public Commit {
     private:
-        char* mergeDetails;
+         std::shared_ptr<char[]> mergeDetails;
     public:
         MergeCommit(const char*, const char*);
         MergeCommit(const MergeCommit&);

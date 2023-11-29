@@ -1,12 +1,14 @@
+#pragma once
 #include "Commit.h"
 #include <iostream>
 #include <cstring>
+#include <memory>
 
 namespace MyGit {
-
     class BugFixCommit : public Commit {
     private:
-        char* bugDetails;
+        std::shared_ptr<char[]> bugDetails; 
+
     public:
         BugFixCommit(const char*, const char*);
         BugFixCommit(const BugFixCommit&);
@@ -20,5 +22,4 @@ namespace MyGit {
         const char* getBugDetails() const;
         virtual void display() const override;
     };
-
 }

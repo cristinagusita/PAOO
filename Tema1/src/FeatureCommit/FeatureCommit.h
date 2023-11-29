@@ -5,7 +5,7 @@
 namespace MyGit {
     class FeatureCommit : public Commit {
     private:
-        char* featureDetails;
+         std::shared_ptr<char[]> featureDetails;
     public:
         FeatureCommit(const char*, const char*);
         FeatureCommit(const FeatureCommit&);
